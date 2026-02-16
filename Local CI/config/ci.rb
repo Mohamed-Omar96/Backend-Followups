@@ -47,8 +47,9 @@ CI.run do
     #   gh signoff install                         # require signoff on your repo
     #
     # When the gh-signoff extension is installed, this step runs automatically.
-    # It is skipped in cloud CI environments (where ENV["CI"] is set).
-    if !ENV["CI"] && `gh extension list 2>/dev/null`.include?("signoff")
+    # Without the extension it falls back to a plain success heading so CI never
+    # fails just because signoff isn't set up yet.
+    if `gh extension list 2>/dev/null`.include?("signoff")
       step "Signoff: All systems go", "gh signoff"
     else
       heading "✅ All CI checks passed!", "Your changes are ready for review"

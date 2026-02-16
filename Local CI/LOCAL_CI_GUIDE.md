@@ -158,8 +158,9 @@ gh signoff install                         # add signoff as a required check on 
 **Pattern in `config/ci.rb`**:
 ```ruby
 if success?
-  # Only runs locally; skipped when ENV["CI"] is set by cloud CI
-  if !ENV["CI"] && `gh extension list 2>/dev/null`.include?("signoff")
+  # Only runs when the gh-signoff extension is installed; falls back to a
+  # plain heading otherwise so CI never fails just because signoff isn't set up.
+  if `gh extension list 2>/dev/null`.include?("signoff")
     step "Signoff: All systems go", "gh signoff"
   else
     heading "✅ All CI checks passed!", "Your changes are ready for review"
