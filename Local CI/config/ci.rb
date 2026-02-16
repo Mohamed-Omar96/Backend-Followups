@@ -39,6 +39,7 @@ CI.run do
   if success?
     # Optional Step: GitHub PR Signoff
     # gh-signoff (by Basecamp) creates a green status check on your PR.
+    # https://github.com/basecamp/gh-signoff
     # You can configure branch protection to require this signoff before merging,
     # giving your team confidence that local CI passed before a PR lands.
     #
