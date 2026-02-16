@@ -1,0 +1,12 @@
+# Ignore temporary files and notes
+*.tmp
+*.bak
+*~
+.DS_Store
+
+# Keep the core documentation files
+!README.md
+!plan.md
+!tasks.md
+!references.md
+!.gitignore

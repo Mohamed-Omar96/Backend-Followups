@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Remotion render output
+out/
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Caches
+.eslintcache
+.cache
+*.tsbuildinfo
+
+# Generated audio
+public/audio/
+*.wav
+*.mp3
+
+# macOS
+.DS_Store
+
+# Logs
+logs/
+*.log
