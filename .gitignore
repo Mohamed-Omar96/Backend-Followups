@@ -11,3 +11,6 @@
 *.swp
 *.swo
 *~
+
+# Structured-Event-Reporting is a separate project; commit it independently
+Structured-Event-Reporting/
