@@ -145,6 +145,34 @@ unless success?
 end
 ```
 
+#### `gh signoff` (via gh-signoff extension)
+
+When integrated with [gh-signoff](https://github.com/basecamp/gh-signoff), `bin/ci` can set a green GitHub status on your PR the moment all checks pass locally. This lets you configure branch protection to **require local signoff** before merging — making your team's PR workflow gate on local CI rather than (or in addition to) cloud CI.
+
+**Setup** (one-time per developer):
+```bash
+gh extension install basecamp/gh-signoff  # install the GitHub CLI extension
+gh signoff install                         # add signoff as a required check on your repo
+```
+
+**Pattern in `config/ci.rb`**:
+```ruby
+if success?
+  # Only runs locally; skipped when ENV["CI"] is set by cloud CI
+  if !ENV["CI"] && `gh extension list 2>/dev/null`.include?("signoff")
+    step "Signoff: All systems go", "gh signoff"
+  else
+    heading "✅ All CI checks passed!", "Your changes are ready for review"
+  end
+else
+  failure "❌ CI checks failed", "Please fix the issues above before submitting your PR"
+end
+```
+
+The guard (`gh extension list ... .include?("signoff")`) ensures the step is silently skipped for developers who haven't installed the extension — no broken CI output.
+
+---
+
 ### Conditional Steps
 
 You can conditionally run steps using Ruby's standard control flow:
@@ -236,6 +264,37 @@ CI.run do
   end
 end
 ```
+
+### With GitHub PR Signoff
+
+**Using gh-signoff to gate PR merges on local CI**:
+
+```ruby
+CI.run do
+  step "Setup", "bin/setup --skip-server"
+
+  step "Style: Ruby", "bin/rubocop" if File.exist?("bin/rubocop")
+  step "Security: Gem audit", "bin/bundler-audit" if File.exist?("bin/bundler-audit")
+  step "Tests: Rails", "bin/rails test"
+
+  if success?
+    # Marks PR with a green GitHub status — requires gh-signoff extension:
+    #   gh extension install basecamp/gh-signoff
+    #   gh signoff install  (once per repo to enable the required check)
+    if !ENV["CI"] && `gh extension list 2>/dev/null`.include?("signoff")
+      step "Signoff: All systems go", "gh signoff"
+    else
+      heading "✅ All CI checks passed!", "Your changes are ready for review"
+    end
+  else
+    failure "❌ CI checks failed", "Please fix the issues above before submitting your PR"
+  end
+end
+```
+
+**Why this matters**: Without signoff, a developer could push code, skip `bin/ci`, and open a PR. With `gh signoff install` enforcing the required check, the PR cannot be merged until `bin/ci` passes locally and signs off — turning your branch protection into a local CI gate.
+
+---
 
 ### Custom Checks
 

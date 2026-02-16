@@ -11,12 +11,15 @@ Comprehensive collection of resources for learning about Rails 8.1 Local CI feat
 
 ### Source Code
 - **[Structured CI with bin/ci GitHub Commit](https://github.com/rails/rails/commit/bcd5c93609c5854399dfb960b3666d318f469eb8)** - Original Rails commit introducing the Local CI feature
+- **[Rails PR #54693: Signoff integration](https://github.com/rails/rails/pull/54693)** - PR adding Signoff support to Local CI (`gh signoff` as an optional final step)
 - **[Rails GitHub Repository](https://github.com/rails/rails)** - Main Rails repository
 
 ## Blog Posts & Tutorials
 
 ### In-Depth Articles
 - **[Rails 8.1 Local CI as First-Class Support - FastRuby.io](https://www.fastruby.io/blog/rails-8-1-local-ci.html)** - Comprehensive overview of the Local CI feature
+- **[Speed Up Your Rails Testing Workflow with Local CI - dev-tester.com](https://dev-tester.com/speed-up-your-rails-testing-workflow-with-local-ci/)** - Practical workflow guide for Local CI
+- **[How We Configure Our Rails Local CI - Good Enough](https://goodenough.us/posts/how-we-configure-our-rails-local-ci)** - Real-world `config/ci.rb` with Signoff integration
 - **[Rails 8.1 introduces bin/ci to standardize CI workflows - Saeloun Blog](https://blog.saeloun.com/2025/12/17/rails-introduces-ci-to-streamline-new-dsl/)** - Detailed explanation of the DSL and usage patterns
 - **[Rails 8.1: Resilient Jobs, Better Logs, and Local CI](https://www.shivamchahar.com/posts/rails-8-1-resilient-jobs-better-logs-local-ci)** - Overview of Rails 8.1 features including Local CI
 
@@ -63,7 +66,8 @@ Comprehensive collection of resources for learning about Rails 8.1 Local CI feat
 - **[Minitest](https://github.com/minitest/minitest)** - Ruby testing framework (default in Rails)
 - **[RSpec](https://rspec.info/)** - Alternative testing framework
 
-### Code Quality Tools
+### Code Quality & Signoff Tools
+- **[gh-signoff](https://github.com/basecamp/gh-signoff)** - GitHub CLI extension by Basecamp; sets a green PR status when local CI passes. Install: `gh extension install basecamp/gh-signoff`
 - **[RuboCop](https://rubocop.org/)** - Ruby static code analyzer and formatter
 - **[Brakeman](https://brakemanscanner.org/)** - Static analysis security vulnerability scanner for Rails
 - **[bundler-audit](https://github.com/rubysec/bundler-audit)** - Patch-level verification for bundler

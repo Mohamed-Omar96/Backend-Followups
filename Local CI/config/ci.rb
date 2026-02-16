@@ -34,10 +34,25 @@ CI.run do
     step "Tests: System", "bin/rails test:system"
   end
 
-  # Success/Failure messaging
+  # Final step: Success/Failure messaging and optional GitHub PR signoff
   # The success? method checks if all previous steps passed
   if success?
-    heading "✅ All CI checks passed!", "Your changes are ready for review"
+    # Optional Step: GitHub PR Signoff
+    # gh-signoff (by Basecamp) creates a green status check on your PR.
+    # You can configure branch protection to require this signoff before merging,
+    # giving your team confidence that local CI passed before a PR lands.
+    #
+    # Setup (one-time):
+    #   gh extension install basecamp/gh-signoff  # install the extension
+    #   gh signoff install                         # require signoff on your repo
+    #
+    # When the gh-signoff extension is installed, this step runs automatically.
+    # It is skipped in cloud CI environments (where ENV["CI"] is set).
+    if !ENV["CI"] && `gh extension list 2>/dev/null`.include?("signoff")
+      step "Signoff: All systems go", "gh signoff"
+    else
+      heading "✅ All CI checks passed!", "Your changes are ready for review"
+    end
   else
     failure "❌ CI checks failed", "Please fix the issues above before submitting your PR"
   end
