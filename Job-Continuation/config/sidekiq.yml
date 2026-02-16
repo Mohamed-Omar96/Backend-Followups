@@ -1,0 +1,29 @@
+# Sidekiq worker configuration
+---
+# Graceful shutdown timeout (seconds)
+# Workers have this much time to complete current job before hard shutdown
+:timeout: 30
+
+# Number of concurrent jobs to process
+# Lower number = easier to see individual job progress in demos
+:concurrency: 2
+
+# Queues to process (queue_name: weight)
+# Higher weight = more likely to be processed first
+:queues:
+  - default
+  - high_priority
+  - low_priority
+
+# Logging configuration
+:verbose: true
+:log_level: info
+
+# Production-specific settings (optional)
+production:
+  :timeout: 60
+  :concurrency: 10
+  :queues:
+    - critical
+    - default
+    - low_priority

@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# Automated demo for Rails 8 Native (ActiveJob::Continuable) pattern
+# Demonstrates job interruption and resumption
+
+set -e
+
+echo ""
+echo "=========================================="
+echo "Rails 8 Native Demo"
+echo "ActiveJob::Continuable Pattern"
+echo "=========================================="
+echo ""
+
+# Check if Sidekiq is running
+if ! pgrep -f sidekiq > /dev/null; then
+    echo "⚠️  Sidekiq is not running"
+    echo ""
+    echo "Starting Sidekiq in background (DEMO_MODE enabled)..."
+    DEMO_MODE=true bundle exec sidekiq -C config/sidekiq.yml > log/sidekiq.log 2>&1 &
+    SIDEKIQ_PID=$!
+    sleep 3
+    echo "✓ Sidekiq started (PID: $SIDEKIQ_PID)"
+    STARTED_SIDEKIQ=true
+else
+    echo "✓ Sidekiq is already running"
+    STARTED_SIDEKIQ=false
+fi
+echo ""
+
+# Ensure clean state
+echo "Preparing demo data..."
+bundle exec rails runner "Order.where.not(status: 'pending').update_all(status: 'pending', processed_at: nil)" 2>/dev/null || true
+PENDING_COUNT=$(bundle exec rails runner "puts Order.pending.count" 2>/dev/null || echo "0")
+echo "✓ Reset $PENDING_COUNT pending orders"
+echo ""
+
+# Enqueue the job
+echo "Enqueuing RailsNative::ProcessOrdersJob..."
+bundle exec rails runner "RailsNative::ProcessOrdersJob.perform_later"
+echo "✓ Job enqueued"
+echo ""
+
+# Monitor for a few seconds
+echo "Job is processing... (monitoring for 10 seconds)"
+sleep 10
+
+# Interrupt
+echo ""
+echo "⚠️  Simulating interruption (SIGTERM)..."
+bundle exec rake demo:interrupt
+sleep 2
+echo "✓ Workers interrupted"
+echo ""
+
+# Show checkpoint state
+echo "Checkpoint state after interruption:"
+bundle exec rake demo:show_checkpoints
+echo ""
+
+# Restart Sidekiq to resume
+echo "Restarting worker to resume from checkpoint..."
+if [ "$STARTED_SIDEKIQ" = true ]; then
+    pkill -f sidekiq || true
+    sleep 2
+    DEMO_MODE=true bundle exec sidekiq -C config/sidekiq.yml > log/sidekiq.log 2>&1 &
+    SIDEKIQ_PID=$!
+    sleep 3
+    echo "✓ Worker restarted (PID: $SIDEKIQ_PID)"
+fi
+echo ""
+
+echo "Job resuming from checkpoint..."
+echo "Monitor progress with: rake demo:monitor"
+echo ""
+echo "Waiting for completion (30 seconds)..."
+sleep 30
+
+# Show final results
+echo ""
+echo "=========================================="
+echo "Demo Complete!"
+echo "=========================================="
+echo ""
+bundle exec rails runner "
+  total = Order.count
+  processed = Order.processed.count
+  puts \"Results:\"
+  puts \"  Total orders: #{total}\"
+  puts \"  Processed: #{processed}\"
+  puts \"  Success rate: #{(processed.to_f / total * 100).round(1)}%\"
+  puts \"\"
+  puts \"✅ Job completed with checkpoint recovery!\"
+"
+echo ""
+echo "=========================================="
+
+# Cleanup if we started Sidekiq
+if [ "$STARTED_SIDEKIQ" = true ]; then
+    echo ""
+    echo "Stopping Sidekiq..."
+    pkill -f sidekiq || true
+fi

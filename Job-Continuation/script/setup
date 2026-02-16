@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# Setup script for Job Continuation Demo
+# Installs dependencies, creates database, and seeds data
+
+set -e
+
+echo "=========================================="
+echo "Job Continuation Demo - Setup"
+echo "=========================================="
+echo ""
+
+# Check Ruby version
+echo "Checking Ruby version..."
+ruby_version=$(ruby -v | awk '{print $2}')
+echo "✓ Ruby $ruby_version"
+echo ""
+
+# Install dependencies
+echo "Installing gem dependencies..."
+bundle install
+echo "✓ Dependencies installed"
+echo ""
+
+# Check Redis
+echo "Checking Redis connection..."
+if redis-cli ping > /dev/null 2>&1; then
+    echo "✓ Redis is running"
+else
+    echo "⚠️  Redis is not running"
+    echo ""
+    echo "Please start Redis:"
+    echo "  macOS (Homebrew): brew services start redis"
+    echo "  Linux (systemd): sudo systemctl start redis"
+    echo "  Manual: redis-server"
+    echo ""
+    read -p "Press Enter when Redis is running, or Ctrl+C to exit..."
+fi
+echo ""
+
+# Create database
+echo "Creating database..."
+bundle exec rails db:create
+echo "✓ Database created"
+echo ""
+
+# Run migrations
+echo "Running migrations..."
+bundle exec rails db:migrate
+echo "✓ Migrations complete"
+echo ""
+
+# Seed data
+echo "Seeding demo data (quick mode)..."
+SEED_MODE=quick bundle exec rails db:seed
+echo "✓ Data seeded"
+echo ""
+
+# Verify setup
+echo "Verifying setup..."
+bundle exec rails demo:verify
+echo ""
+
+echo "=========================================="
+echo "Setup Complete!"
+echo "=========================================="
+echo ""
+echo "Next steps:"
+echo "  1. Start Sidekiq:"
+echo "     bundle exec sidekiq -C config/sidekiq.yml"
+echo ""
+echo "  2. Run a demo:"
+echo "     ./script/demo_rails_native"
+echo "     ./script/demo_job_iteration"
+echo "     ./script/demo_comparison"
+echo ""
+echo "=========================================="

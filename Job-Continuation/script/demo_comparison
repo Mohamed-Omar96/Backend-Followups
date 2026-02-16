@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Side-by-side comparison demo of Rails Native vs job-iteration
+# Compares performance and checkpoint behavior
+
+set -e
+
+echo ""
+echo "=========================================="
+echo "Job Continuation Pattern Comparison"
+echo "Rails 8 Native vs job-iteration"
+echo "=========================================="
+echo ""
+
+# Check if Sidekiq is running
+if pgrep -f sidekiq > /dev/null; then
+    echo "⚠️  Sidekiq is running, stopping it for clean comparison..."
+    pkill -f sidekiq || true
+    sleep 2
+fi
+
+echo "This comparison will:"
+echo "  1. Run Rails 8 Native ProcessOrdersJob"
+echo "  2. Run job-iteration ProcessOrdersIterationJob"
+echo "  3. Compare performance and checkpoint behavior"
+echo ""
+echo "Estimated time: 2-3 minutes"
+echo ""
+read -p "Press Enter to continue..."
+echo ""
+
+# Run comparison
+bundle exec rake demo:compare
+
+echo ""
+echo "=========================================="
+echo "Comparison Complete!"
+echo "=========================================="
+echo ""
+echo "Key Takeaways:"
+echo "  • Both patterns prevent progress loss on interruption"
+echo "  • Rails 8 Native: Built-in, step-based API"
+echo "  • job-iteration: Battle-tested, enumerator pattern"
+echo ""
+echo "See AGENTS.md for detailed comparison and recommendations"
+echo ""
+echo "=========================================="
