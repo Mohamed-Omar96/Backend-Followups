@@ -1,0 +1,51 @@
+Continuous Integration
+Running tests, style checks, and security audits
+
+Setup
+bin/setup --skip-server
+
+== Installing dependencies ==
+The Gemfile's dependencies are satisfied
+
+== Preparing database ==
+
+== Removing old logs and tempfiles ==
+
+✅ Setup passed in 4.11s
+
+Style: Ruby
+bin/rubocop
+
+Inspecting 30 files
+..............................
+
+30 files inspected, no offenses detected
+
+✅ Style: Ruby passed in 5.07s
+
+Security: Gem audit
+bin/bundler-audit
+
+No vulnerabilities found
+
+✅ Security: Gem audit passed in 0.68s
+
+Tests: Rails
+bin/rails test
+
+Running 12 tests in a single process (parallelization threshold is 50)
+Run options: --seed 10795
+
+# Running:
+
+............
+
+Finished in 0.196230s, 61.1527 runs/s, 91.7291 assertions/s.
+12 runs, 18 assertions, 0 failures, 0 errors, 0 skips
+
+✅ Tests: Rails passed in 5.31s
+
+✅ All CI checks passed!
+Your changes are ready for review
+
+✅ Continuous Integration passed in 15.18s

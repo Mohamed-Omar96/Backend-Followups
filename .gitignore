@@ -1,0 +1,16 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Misc editor artifacts
+*.swp
+*.swo
+*~
+
+# Structured-Event-Reporting is a separate project; commit it independently
+Structured-Event-Reporting/
